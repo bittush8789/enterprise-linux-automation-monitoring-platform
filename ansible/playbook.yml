@@ -1,0 +1,14 @@
+---
+- name: Configure Target Nodes
+  hosts: target_nodes
+  become: yes
+  roles:
+    - common
+    - monitoring-agent
+
+- name: Configure App Node
+  hosts: app_nodes
+  become: yes
+  roles:
+    - common
+    - docker

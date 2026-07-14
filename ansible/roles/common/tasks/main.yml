@@ -1,0 +1,49 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install common packages
+  apt:
+    name:
+      - vim
+      - curl
+      - wget
+      - htop
+      - ufw
+      - fail2ban
+      - jq
+      - unzip
+    state: present
+
+- name: Configure UFW
+  ufw:
+    state: enabled
+    policy: deny
+
+- name: Allow SSH in UFW
+  ufw:
+    rule: allow
+    port: '22'
+    proto: tcp
+
+- name: Enable Fail2Ban service
+  systemd:
+    name: fail2ban
+    enabled: yes
+    state: started
+
+- name: Hardening SSH config
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin no"
+  notify: Restart SSH
+
+- name: Password authentication disable
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PasswordAuthentication"
+    line: "PasswordAuthentication no"
+  notify: Restart SSH
